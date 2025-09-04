@@ -5,13 +5,13 @@ if ($conexao->connect_error) {
     die("Falha na conexão: " . $conexao->connect_error);
 }
 
-$nome = $_POST['nome'];
-$placa = $_POST['placa'];
-$chassi = $_POST['chassi'];
-$montadora = $_POST['montadora'];
+$nome = $conexao->real_escape_string($_POST['nome']);
+$placa = $conexao->real_escape_string($_POST['placa']);
+$chassi = $conexao->real_escape_string($_POST['chassi']);
+$montadora = intval($_POST['montadora']);
 
 $sql = "INSERT INTO automoveis (nome, placa, chassi, montadora)
-        VALUES ('$nome', '$placa', '$chassi', '$montadora')";
+        VALUES ('$nome', '$placa', '$chassi', $montadora)";
 ?>
 
 <!DOCTYPE html>
@@ -31,7 +31,11 @@ $sql = "INSERT INTO automoveis (nome, placa, chassi, montadora)
             if ($conexao->query($sql) === TRUE) {
                 echo "<h3 class='text-success mb-3'>Automóvel cadastrado com sucesso!</h3>";
             } else {
-                echo "<h3 class='text-danger mb-3'>Erro: " . $conexao->error . "</h3>";
+                if ($conexao->errno == 1062) {
+                    echo "<h3 class='text-danger mb-3'>Erro: Placa ou Chassi já cadastrado!</h3>";
+                } else {
+                    echo "<h3 class='text-danger mb-3'>Erro: " . $conexao->error . "</h3>";
+                }
             }
             ?>
             <a href="index.php" class="btn btn-primary mt-3">Cadastrar Novo</a>

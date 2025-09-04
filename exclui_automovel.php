@@ -8,16 +8,24 @@ if ($conexao->connect_error) {
 if (isset($_GET['codigo'])) {
     $codigo = intval($_GET['codigo']);
 
+    $check = $conexao->query("SELECT * FROM automoveis WHERE codigo = $codigo");
+    if ($check->num_rows === 0) {
+        header("Location: listaautomoveis.php?msg=naoencontrado");
+        exit;
+    }
+
     $sql = "DELETE FROM automoveis WHERE codigo = $codigo";
 
     if ($conexao->query($sql) === TRUE) {
         header("Location: listaautomoveis.php?msg=excluido");
         exit;
     } else {
-        echo "Erro ao excluir: " . $conexao->error;
+        header("Location: listaautomoveis.php?msg=erro");
+        exit;
     }
 } else {
-    echo "Código não informado.";
+    header("Location: listaautomoveis.php?msg=codnaoinformado");
+    exit;
 }
 
 $conexao->close();

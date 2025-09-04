@@ -1,4 +1,4 @@
-CREATE DATABASE cadastro_automoveis;
+CREATE DATABASE IF NOT EXISTS cadastro_automoveis;
 USE cadastro_automoveis;
 
 CREATE TABLE montadoras (
@@ -8,17 +8,19 @@ CREATE TABLE montadoras (
 
 INSERT INTO montadoras (nome) VALUES
     ('Volkswagen'),
-	('Ford'),
-	('Fiat'),
-	('Chevrolet');
-    
+    ('Ford'),
+    ('Fiat'),
+    ('Chevrolet');
+
 CREATE TABLE automoveis (
     codigo INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(50) NOT NULL,
     placa VARCHAR(10) NOT NULL,
     chassi VARCHAR(50) NOT NULL,
     montadora INT,
-    FOREIGN KEY (montadora) REFERENCES montadoras(codigo)
+    UNIQUE (placa),
+    UNIQUE (chassi),
+    CONSTRAINT fk_montadora FOREIGN KEY (montadora) REFERENCES montadoras(codigo)
 );
 
 INSERT INTO automoveis (nome, placa, chassi, montadora) VALUES

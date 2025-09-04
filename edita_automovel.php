@@ -5,33 +5,39 @@ if ($conexao->connect_error) {
     die("Falha na conexão: " . $conexao->connect_error);
 }
 
-// Verifica se o código foi passado
 if (!isset($_GET['codigo'])) {
     die("Código do automóvel não informado.");
 }
 
 $codigo = intval($_GET['codigo']);
+$msg = "";
 
-// Atualiza os dados se o formulário for enviado
 if (isset($_POST['atualizar'])) {
     $nome = $conexao->real_escape_string($_POST['nome']);
     $placa = $conexao->real_escape_string($_POST['placa']);
     $chassi = $conexao->real_escape_string($_POST['chassi']);
     $montadora = intval($_POST['montadora']);
 
-    $sql_update = "UPDATE automoveis 
-                   SET nome='$nome', placa='$placa', chassi='$chassi', montadora=$montadora 
-                   WHERE codigo=$codigo";
+    $sql_check = "SELECT * FROM automoveis 
+                  WHERE (placa='$placa' OR chassi='$chassi') AND codigo<>$codigo";
+    $result_check = $conexao->query($sql_check);
 
-    if ($conexao->query($sql_update) === TRUE) {
-        header("Location: listaautomoveis.php?msg=atualizado");
-        exit;
+    if ($result_check->num_rows > 0) {
+        $msg = "Erro: Placa ou Chassi já cadastrado em outro automóvel!";
     } else {
-        echo "Erro ao atualizar: " . $conexao->error;
+        $sql_update = "UPDATE automoveis 
+                       SET nome='$nome', placa='$placa', chassi='$chassi', montadora=$montadora 
+                       WHERE codigo=$codigo";
+
+        if ($conexao->query($sql_update) === TRUE) {
+            header("Location: listaautomoveis.php?msg=atualizado");
+            exit;
+        } else {
+            $msg = "Erro ao atualizar: " . $conexao->error;
+        }
     }
 }
 
-// Busca os dados atuais do automóvel
 $sql = "SELECT * FROM automoveis WHERE codigo=$codigo";
 $result = $conexao->query($sql);
 
@@ -41,7 +47,6 @@ if ($result->num_rows == 0) {
 
 $row = $result->fetch_assoc();
 
-// Busca todas as montadoras para o select
 $sql_montadoras = "SELECT * FROM montadoras";
 $result_montadoras = $conexao->query($sql_montadoras);
 ?>
