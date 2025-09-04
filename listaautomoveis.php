@@ -22,17 +22,20 @@ $resultado = $conexao->query($sql);
 
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Automóveis</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-
 <body class="bg-light">
     <div class="container mt-5">
         <h1 class="mb-4 text-center">Lista de Automóveis</h1>
+        <?php if (isset($_GET['msg']) && $_GET['msg'] == 'excluido'): ?>
+            <div class="alert alert-success text-center">
+                Automóvel excluído com sucesso!
+            </div>
+        <?php endif; ?>
 
         <!-- Formulário de busca -->
         <div class="card shadow-lg p-4 mb-4">
@@ -52,22 +55,34 @@ $resultado = $conexao->query($sql);
                         <th>Placa</th>
                         <th>Chassi</th>
                         <th>Montadora</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
                     if ($resultado->num_rows > 0) {
                         while ($row = $resultado->fetch_assoc()) {
-                            echo "<tr>
-                                    <td>{$row['codigo']}</td>
-                                    <td>{$row['carro']}</td>
-                                    <td>{$row['placa']}</td>
-                                    <td>{$row['chassi']}</td>
-                                    <td>{$row['montadora']}</td>
-                                  </tr>";
+                            echo '<tr>
+                                    <td>'.$row['codigo'].'</td>
+                                    <td>'.$row['carro'].'</td>
+                                    <td>'.$row['placa'].'</td>
+                                    <td>'.$row['chassi'].'</td>
+                                    <td>'.$row['montadora'].'</td>
+                                    <td>
+                                        <a href="edita_automovel.php?codigo='.$row['codigo'].'" 
+                                           class="btn btn-warning btn-sm me-1">
+                                           Editar
+                                        </a>
+                                        <a href="exclui_automovel.php?codigo='.$row['codigo'].'"
+                                           class="btn btn-danger btn-sm"
+                                           onclick="return confirm(\'Tem certeza que deseja excluir este automóvel?\')">
+                                           Excluir
+                                        </a>
+                                    </td>
+                                  </tr>';
                         }
                     } else {
-                        echo "<tr><td colspan='5' class='text-center'>Nenhum automóvel encontrado.</td></tr>";
+                        echo '<tr><td colspan="6" class="text-center">Nenhum automóvel encontrado.</td></tr>';
                     }
                     ?>
                 </tbody>
@@ -79,5 +94,4 @@ $resultado = $conexao->query($sql);
         </div>
     </div>
 </body>
-
 </html>
